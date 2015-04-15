@@ -49,7 +49,7 @@ class Parser:
             return CommandType.C
         
         lCmd = re_L_COMMAND.findall(command)
-        if len(lCmd) > 0 and Cmd[0] == command:
+        if len(lCmd) > 0 and lCmd[0] == command:
             return CommandType.L
         
         return CommandType.E
@@ -96,34 +96,38 @@ class Parser:
     def dest(self):
         if self.currentCommandType == CommandType.C:            
             dest = max(re_dest.findall(self.currentCommand), key=len)
-            if(dest != None):
+            if(dest != None and dest != ''):
                 return dest.split("=")[0]
         return None
 
     def comp(self):
-        if self.currentCommandType == CommandType.C:
-            comp = max(re_comp.findall(self.currentCommand), key=len)
+        if self.currentCommandType == CommandType.C:        
+            if self.dest() != None:                
+                comp = max(re_comp.findall(self.currentCommand.split("=")[1]), key=len)
+            else:
+                comp = max(re_comp.findall(self.currentCommand), key=len)
             return comp
         return None
 
     def jump(self):
         if self.currentCommandType == CommandType.C:
-            jump = max(re_jump.findall(self.currentCommand), key=len)
-            if(jump != None):
+            jump = max(re_jump.findall(self.currentCommand), key=len)            
+            if(jump != None and jump != ''):
                 return jump.split(";")[1]
         return None
 
 
 def Test():
-    p = Parser("/home/ben/CS/Master/Nand2Tetris/tools/test.asm")
+    p = Parser("/home/ben/CS/Master/Nand2Tetris/projects/06/rect/Rect.asm")
     
-    if(p.hasMoreCommands()):
+    while(p.hasMoreCommands()):
         p.advance()
-        print "dest is " + p.dest()
-        print "comp is " + p.comp()
-        print "jump is " + p.jump()
-    else:
-        print "no more commands"
+        if(p.commandType() == CommandType.C):
+            print p.currentCommand
+            print "dest is " + str(p.dest())
+            print "comp is " + str(p.comp())
+            print "jump is " + str(p.jump())
+            print "===================================="
 
 
 Test()
