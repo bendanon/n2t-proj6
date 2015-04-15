@@ -123,11 +123,15 @@ def Test():
     
     while(p.hasMoreCommands()):
         p.advance()
+        print p.currentCommand
         if(p.commandType() != CommandType.C):
-            print p.currentCommand
             print p.commandType()
             print p.symbol()
-            print "===================================="
+        else:                
+            print p.dest()
+            print p.comp()
+            print p.jump()
+        print "===================================="
 
 
 Test()
