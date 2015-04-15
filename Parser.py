@@ -12,13 +12,14 @@ class CommandType:
 dest="(?:M=|D=|MD=|A=|AM=|AD=|AMD=)?"
 jump="(?:;JGT|;JEQ|;JGE|;JLT|;JNE|;JLE|;JMP)?"
 comp="(?:[AMD][+-]1|[AM]-D|D[&+-][AM]|D\\|[AM]|[01]|[-!]?[AMD])"
+legalCharsInLabel="[A-Za-z_0-9]*"
 
-re_A_COMMAND = re.compile("@[A-Za-z]*|@[0-9]*")
+re_A_COMMAND = re.compile("@"+legalCharsInLabel)
 re_dest = re.compile(dest)
 re_jump = re.compile(jump)
 re_comp = re.compile(comp)
 re_C_COMMAND = re.compile(dest + comp + jump)
-re_L_COMMAND = re.compile("([A-Za-z]*)")
+re_L_COMMAND = re.compile("\(" + legalCharsInLabel +"\)")
 
 re_comment = re.compile('//|/*')
 
@@ -118,15 +119,14 @@ class Parser:
 
 
 def Test():
-    p = Parser("/home/ben/CS/Master/Nand2Tetris/projects/06/rect/Rect.asm")
+    p = Parser("/home/ben/CS/Master/Nand2Tetris/projects/06/pong/Pong.asm")
     
     while(p.hasMoreCommands()):
         p.advance()
-        if(p.commandType() == CommandType.C):
+        if(p.commandType() != CommandType.C):
             print p.currentCommand
-            print "dest is " + str(p.dest())
-            print "comp is " + str(p.comp())
-            print "jump is " + str(p.jump())
+            print p.commandType()
+            print p.symbol()
             print "===================================="
 
 
