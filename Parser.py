@@ -9,60 +9,51 @@ class Parser:
     removes all white spaces and comments.
     """
     def __init__(self, filename):
-        self.infile = open(filename)
-        self.currentCommand = ''
-        self.nextCommand = ''
-        self.currentCommandType = CommandType.E
-        self.nextCommandType = CommandType.E
+        self.commands = [self.cleanCommand(line)
+                         for line in open(filename).readlines()]
+        self.commands = filter(lambda c: c != "", self.commands)
+
+        self.current_index = 0
+        self.currentCommand = self.commands[self.current_index]
+        self.current_type = self.ParseCommandType(self.currentCommand)
 
     def hasMoreCommands(self):
         '''
         Are there more commands in the input?
         This method runs to the next meaningful line, and returns true
-        if one exists (false otherwise). It sets nextCommand with it.
-        And sets nextCommandType with its type
+        if one exists (false otherwise).
         '''
-        raw_line = self.infile.readline()
-        while len(raw_line) != 0:
-            clean_line = self.cleanCommand(raw_line)
-            if(len(clean_line) != 0):  # Discards comment lines
-                cmd_type = self.ParseCommandType(clean_line)
-                if(cmd_type != CommandType.E):
-                    self.nextCommand = clean_line
-                    self.nextCommandType = cmd_type
-                    return True
-            raw_line = self.infile.readline()
-
-        return False
+        return self.current_index < len(self.commands)
 
     def advance(self):
         '''
         Reads the next command from the input and makes it the current
         command. Should be called only if hasMoreCommands is true.
-        Initially, there is no current command
         '''
-        self.currentCommand = self.nextCommand
-        self.currentCommandType = self.nextCommandType
+        self.current_index += 1
+        if self.hasMoreCommands():
+            self.currentCommand = self.commands[self.current_index]
+            self.current_type = self.ParseCommandType(self.currentCommand)
 
     def commandType(self):
-        return self.currentCommandType
+        return self.current_type
 
     def symbol(self):
-        if self.currentCommandType == CommandType.A:
+        if self.current_type == CommandType.A:
             return self.currentCommand.split("@")[1]
 
-        if self.currentCommandType == CommandType.L:
+        if self.current_type == CommandType.L:
             return self.currentCommand.split("(")[1].split(")")[0]
 
     def dest(self):
-        if self.currentCommandType == CommandType.C:
+        if self.current_type == CommandType.C:
             dest = max(re_dest.findall(self.currentCommand), key=len)
             if(dest is not None and dest != ''):
                 return dest.split("=")[0]
         return None
 
     def comp(self):
-        if self.currentCommandType == CommandType.C:
+        if self.current_type == CommandType.C:
             if self.dest() is not None:
                 comp = max(re_comp.findall(self.currentCommand.split("=")[1]),
                            key=len)
@@ -72,7 +63,7 @@ class Parser:
         return None
 
     def jump(self):
-        if self.currentCommandType == CommandType.C:
+        if self.current_type == CommandType.C:
             jump = max(re_jump.findall(self.currentCommand), key=len)
             if(jump is not None and jump != ''):
                 return jump.split(";")[1]
@@ -85,7 +76,6 @@ class Parser:
         return command.split('/')[0].strip()
 
     def ParseCommandType(self, command):
-        
         aCmd = re_A_COMMAND.findall(command)
         if len(aCmd) > 0 and aCmd[0] == command:
             return CommandType.A
@@ -118,4 +108,3 @@ re_jump = re.compile(jump)
 re_comp = re.compile(comp)
 re_C_COMMAND = re.compile(dest + comp + jump)
 re_L_COMMAND = re.compile("\(" + legalCharsInLabel + "\)")
-

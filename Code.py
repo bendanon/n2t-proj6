@@ -23,19 +23,19 @@ class Code:
                           "D|M": 0b010101}
 
     def dest(self, mnemonic):
-        if not mnemonic.isdigit():
+        if mnemonic is None or not mnemonic.isdigit():
             mnemonic = self.dest_dict[mnemonic]
         return format(mnemonic, '03b')
 
     def jump(self, mnemonic):
-        if not mnemonic.isdigit():
+        if mnemonic is None or not mnemonic.isdigit():
             mnemonic = self.jump_dict[mnemonic]
         return format(mnemonic, '03b')
 
     def comp(self, mnemonic):
         comp = self.comp_dict[mnemonic]
         comp = format(comp, '06b')
-        if 'A' in mnemonic:
-            return '0' + comp
-        else:
+        if 'M' in mnemonic:
             return '1' + comp
+        else:
+            return '0' + comp
