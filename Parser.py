@@ -122,7 +122,7 @@ re_comment = re.compile('//|/*')
 
 
 def Test():
-    p = Parser("/home/ben/CS/Master/Nand2Tetris/projects/06/pong/Pong.asm")
+    p = Parser("Input/add/Add.asm")
 
     while(p.hasMoreCommands()):
         p.advance()
