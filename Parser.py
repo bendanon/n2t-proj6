@@ -82,9 +82,10 @@ class Parser:
         '''
         Removes whitespace and comments
         '''
-        return re_comment.split(command.strip())[0]
+        return command.split('/')[0].strip()
 
     def ParseCommandType(self, command):
+        
         aCmd = re_A_COMMAND.findall(command)
         if len(aCmd) > 0 and aCmd[0] == command:
             return CommandType.A
@@ -118,4 +119,3 @@ re_comp = re.compile(comp)
 re_C_COMMAND = re.compile(dest + comp + jump)
 re_L_COMMAND = re.compile("\(" + legalCharsInLabel + "\)")
 
-re_comment = re.compile('//|/*')
