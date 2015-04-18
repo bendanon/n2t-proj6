@@ -1,87 +1,46 @@
-'''
-Unpacks each command into its underlying fields
-'''
 import re
 
 
-class CommandType:
-    E = 0
-    A = 1
-    C = 2
-    L = 3
-
-dest = "(?:M=|D=|MD=|A=|AM=|AD=|AMD=)?"
-jump = "(?:;JGT|;JEQ|;JGE|;JLT|;JNE|;JLE|;JMP)?"
-comp = "(?:[AMD][+-]1|[AM]-D|D[&+-][AM]|D\\|[AM]|[01]|[-!]?[AMD])"
-legalCharsInLabel = "[A-Za-z_0-9]*"
-
-re_A_COMMAND = re.compile("@"+legalCharsInLabel)
-re_dest = re.compile(dest)
-re_jump = re.compile(jump)
-re_comp = re.compile(comp)
-re_C_COMMAND = re.compile(dest + comp + jump)
-re_L_COMMAND = re.compile("\(" + legalCharsInLabel + "\)")
-
-re_comment = re.compile('//|/*')
-
-
 class Parser:
-
+    """
+    Encapsulates access to the input code. Reads an assembly
+    command, parses it, and provides convenient access to the
+    command's components (fields and symbols). In addition,
+    removes all white spaces and comments.
+    """
     def __init__(self, filename):
-        self.infile = open(filename, 'r')
-        self.moreCommands = False
+        self.infile = open(filename)
         self.currentCommand = ''
         self.nextCommand = ''
         self.currentCommandType = CommandType.E
         self.nextCommandType = CommandType.E
 
-    '''
-    Removes whitespace and comments
-    '''
-    def cleanCommand(self, command):
-        return re_comment.split(command.strip())[0]
-
-    def getCommandType(self, command):
-        aCmd = re_A_COMMAND.findall(command)
-        if len(aCmd) > 0 and aCmd[0] == command:
-            return CommandType.A
-
-        cCmd = re_C_COMMAND.findall(command)
-        if len(cCmd) > 0 and cCmd[0] == command:
-            return CommandType.C
-
-        lCmd = re_L_COMMAND.findall(command)
-        if len(lCmd) > 0 and lCmd[0] == command:
-            return CommandType.L
-
-        return CommandType.E
-
-    '''
-    Are there more commands in the input?
-    This method runs to the next meaningful line, and returns true
-    if one exists (false otherwise). It sets nextCommand with it.
-    And sets nextCommandType with its type
-    '''
     def hasMoreCommands(self):
-        rawLine = self.infile.readline()
-        while len(rawLine) != 0:
-            cleanLine = self.cleanCommand(rawLine)
-            if(len(cleanLine) != 0):
-                cmdType = self.getCommandType(cleanLine)
-                if(cmdType != CommandType.E):
-                    self.nextCommand = cleanLine
-                    self.nextCommandType = cmdType
+        '''
+        Are there more commands in the input?
+        This method runs to the next meaningful line, and returns true
+        if one exists (false otherwise). It sets nextCommand with it.
+        And sets nextCommandType with its type
+        '''
+        raw_line = self.infile.readline()
+        while len(raw_line) != 0:
+            clean_line = self.cleanCommand(raw_line)
+            if(len(clean_line) != 0):  # Discards comment lines
+                cmd_type = self.ParseCommandType(clean_line)
+                if(cmd_type != CommandType.E):
+                    self.nextCommand = clean_line
+                    self.nextCommandType = cmd_type
                     return True
-            rawLine = self.infile.readline()
+            raw_line = self.infile.readline()
 
         return False
 
-    '''
-    Reads the next command from the input and makes it the current
-    command. Should be called only if hasMoreCommands is true.
-    Initially, there is no current command
-    '''
     def advance(self):
+        '''
+        Reads the next command from the input and makes it the current
+        command. Should be called only if hasMoreCommands is true.
+        Initially, there is no current command
+        '''
         self.currentCommand = self.nextCommand
         self.currentCommandType = self.nextCommandType
 
@@ -118,6 +77,48 @@ class Parser:
             if(jump is not None and jump != ''):
                 return jump.split(";")[1]
         return None
+
+    def cleanCommand(self, command):
+        '''
+        Removes whitespace and comments
+        '''
+        return re_comment.split(command.strip())[0]
+
+    def ParseCommandType(self, command):
+        aCmd = re_A_COMMAND.findall(command)
+        if len(aCmd) > 0 and aCmd[0] == command:
+            return CommandType.A
+
+        cCmd = re_C_COMMAND.findall(command)
+        if len(cCmd) > 0 and cCmd[0] == command:
+            return CommandType.C
+
+        lCmd = re_L_COMMAND.findall(command)
+        if len(lCmd) > 0 and lCmd[0] == command:
+            return CommandType.L
+
+        return CommandType.E
+
+
+class CommandType:
+    E = 0  # Empty
+    A = 1  # A-Instruction
+    C = 2  # C-Instruction
+    L = 3  # Label
+
+dest = "(?:M=|D=|MD=|A=|AM=|AD=|AMD=)?"
+jump = "(?:;JGT|;JEQ|;JGE|;JLT|;JNE|;JLE|;JMP)?"
+comp = "(?:[AMD][+-]1|[AM]-D|D[&+-][AM]|D\\|[AM]|[01]|[-!]?[AMD])"
+legalCharsInLabel = "[A-Za-z_0-9]*"
+
+re_A_COMMAND = re.compile("@"+legalCharsInLabel)
+re_dest = re.compile(dest)
+re_jump = re.compile(jump)
+re_comp = re.compile(comp)
+re_C_COMMAND = re.compile(dest + comp + jump)
+re_L_COMMAND = re.compile("\(" + legalCharsInLabel + "\)")
+
+re_comment = re.compile('//|/*')
 
 
 def Test():

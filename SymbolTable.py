@@ -1,10 +1,8 @@
-'''
-Manages the symbol table
-'''
-
-
 class SymbolTable:
-
+    """
+    Keeps a correspondence between symbolic
+    labels and numeric addresses.
+    """
     def __init__(self):
 
         self.table = {}
@@ -12,7 +10,7 @@ class SymbolTable:
         for i in range(0, 16):
             self.table['R'+str(i)] = i
 
-        self.table['SCRREN'] = 16384
+        self.table['SCREEN'] = 16384
         self.table['KBD'] = 24576
         self.table['SP'] = 0
         self.table['LCL'] = 1
@@ -27,7 +25,7 @@ class SymbolTable:
         return symbol in self.table
 
     def GetAddress(self, symbol):
-        return self.table.get(symbol)
+        return self.table[symbol]
 
 
 def Test():
