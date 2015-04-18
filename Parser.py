@@ -63,7 +63,7 @@ class Parser:
 
     def comp(self):
         if self.currentCommandType == CommandType.C:
-            if self.dest() != None:
+            if self.dest() is not None:
                 comp = max(re_comp.findall(self.currentCommand.split("=")[1]),
                            key=len)
             else:
@@ -119,21 +119,3 @@ re_C_COMMAND = re.compile(dest + comp + jump)
 re_L_COMMAND = re.compile("\(" + legalCharsInLabel + "\)")
 
 re_comment = re.compile('//|/*')
-
-
-def Test():
-    p = Parser("Input/add/Add.asm")
-
-    while(p.hasMoreCommands()):
-        p.advance()
-        print p.currentCommand
-        if(p.commandType() != CommandType.C):
-            print p.commandType()
-            print p.symbol()
-        else:
-            print p.dest()
-            print p.comp()
-            print p.jump()
-        print "===================================="
-
-Test()

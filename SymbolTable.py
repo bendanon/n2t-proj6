@@ -18,19 +18,19 @@ class SymbolTable:
         self.table['THIS'] = 3
         self.table['THAT'] = 4
 
-    def addEntry(self, symbol, address):
+    def add_entry(self, symbol, address):
         self.table[symbol] = address
 
     def contains(self, symbol):
         return symbol in self.table
 
-    def GetAddress(self, symbol):
+    def get_address(self, symbol):
         return self.table[symbol]
 
 
 def Test():
     st = SymbolTable()
     print st.contains('KBD')
-    print st.GetAddress('ARG')
-    st.addEntry('Ben', 80)
-    print st.GetAddress('Ben')
+    print st.get_address('ARG')
+    st.add_entry('Ben', 80)
+    print st.get_address('Ben')
