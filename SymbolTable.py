@@ -2,13 +2,14 @@
 Manages the symbol table
 '''
 
+
 class SymbolTable:
 
     def __init__(self):
 
         self.table = {}
 
-        for i in range(0,16):
+        for i in range(0, 16):
             self.table['R'+str(i)] = i
 
         self.table['SCRREN'] = 16384
@@ -23,7 +24,7 @@ class SymbolTable:
         self.table[symbol] = address
 
     def contains(self, symbol):
-        return self.table.has_key(symbol)
+        return symbol in self.table
 
     def GetAddress(self, symbol):
         return self.table.get(symbol)
@@ -33,6 +34,5 @@ def Test():
     st = SymbolTable()
     print st.contains('KBD')
     print st.GetAddress('ARG')
-    st.addEntry('Ben', 80);
+    st.addEntry('Ben', 80)
     print st.GetAddress('Ben')
-

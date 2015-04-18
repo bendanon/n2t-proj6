@@ -3,36 +3,37 @@ Unpacks each command into its underlying fields
 '''
 import re
 
+
 class CommandType:
     E = 0
     A = 1
     C = 2
     L = 3
-    
-dest="(?:M=|D=|MD=|A=|AM=|AD=|AMD=)?"
-jump="(?:;JGT|;JEQ|;JGE|;JLT|;JNE|;JLE|;JMP)?"
-comp="(?:[AMD][+-]1|[AM]-D|D[&+-][AM]|D\\|[AM]|[01]|[-!]?[AMD])"
-legalCharsInLabel="[A-Za-z_0-9]*"
+
+dest = "(?:M=|D=|MD=|A=|AM=|AD=|AMD=)?"
+jump = "(?:;JGT|;JEQ|;JGE|;JLT|;JNE|;JLE|;JMP)?"
+comp = "(?:[AMD][+-]1|[AM]-D|D[&+-][AM]|D\\|[AM]|[01]|[-!]?[AMD])"
+legalCharsInLabel = "[A-Za-z_0-9]*"
 
 re_A_COMMAND = re.compile("@"+legalCharsInLabel)
 re_dest = re.compile(dest)
 re_jump = re.compile(jump)
 re_comp = re.compile(comp)
 re_C_COMMAND = re.compile(dest + comp + jump)
-re_L_COMMAND = re.compile("\(" + legalCharsInLabel +"\)")
+re_L_COMMAND = re.compile("\(" + legalCharsInLabel + "\)")
 
 re_comment = re.compile('//|/*')
 
+
 class Parser:
-    
+
     def __init__(self, filename):
-        self.infile = open(filename, 'r')        
+        self.infile = open(filename, 'r')
         self.moreCommands = False
         self.currentCommand = ''
         self.nextCommand = ''
         self.currentCommandType = CommandType.E
-        self.nextCommandType = CommandType.E        
-
+        self.nextCommandType = CommandType.E
 
     '''
     Removes whitespace and comments
@@ -48,13 +49,13 @@ class Parser:
         cCmd = re_C_COMMAND.findall(command)
         if len(cCmd) > 0 and cCmd[0] == command:
             return CommandType.C
-        
+
         lCmd = re_L_COMMAND.findall(command)
         if len(lCmd) > 0 and lCmd[0] == command:
             return CommandType.L
-        
+
         return CommandType.E
-    
+
     '''
     Are there more commands in the input?
     This method runs to the next meaningful line, and returns true
@@ -82,29 +83,30 @@ class Parser:
     '''
     def advance(self):
         self.currentCommand = self.nextCommand
-        self.currentCommandType = self.nextCommandType 
+        self.currentCommandType = self.nextCommandType
 
     def commandType(self):
         return self.currentCommandType
 
     def symbol(self):
-        if self.currentCommandType == CommandType.A:       
+        if self.currentCommandType == CommandType.A:
             return self.currentCommand.split("@")[1]
-    
+
         if self.currentCommandType == CommandType.L:
             return self.currentCommand.split("(")[1].split(")")[0]
 
     def dest(self):
-        if self.currentCommandType == CommandType.C:            
+        if self.currentCommandType == CommandType.C:
             dest = max(re_dest.findall(self.currentCommand), key=len)
-            if(dest != None and dest != ''):
+            if(dest is not None and dest != ''):
                 return dest.split("=")[0]
         return None
 
     def comp(self):
-        if self.currentCommandType == CommandType.C:        
-            if self.dest() != None:                
-                comp = max(re_comp.findall(self.currentCommand.split("=")[1]), key=len)
+        if self.currentCommandType == CommandType.C:
+            if self.dest() != None:
+                comp = max(re_comp.findall(self.currentCommand.split("=")[1]),
+                           key=len)
             else:
                 comp = max(re_comp.findall(self.currentCommand), key=len)
             return comp
@@ -112,27 +114,25 @@ class Parser:
 
     def jump(self):
         if self.currentCommandType == CommandType.C:
-            jump = max(re_jump.findall(self.currentCommand), key=len)            
-            if(jump != None and jump != ''):
+            jump = max(re_jump.findall(self.currentCommand), key=len)
+            if(jump is not None and jump != ''):
                 return jump.split(";")[1]
         return None
 
 
 def Test():
     p = Parser("/home/ben/CS/Master/Nand2Tetris/projects/06/pong/Pong.asm")
-    
+
     while(p.hasMoreCommands()):
         p.advance()
         print p.currentCommand
         if(p.commandType() != CommandType.C):
             print p.commandType()
             print p.symbol()
-        else:                
+        else:
             print p.dest()
             print p.comp()
             print p.jump()
         print "===================================="
 
-
 Test()
-

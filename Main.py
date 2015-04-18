@@ -1,7 +1,7 @@
 '''
 Initializes I/O files and drives the show.
 '''
-import 
+
 
 def main():
     print "Hello, world!"
