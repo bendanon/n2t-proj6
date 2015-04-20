@@ -100,7 +100,7 @@ class CommandType:
 dest = "(?:M=|D=|MD=|A=|AM=|AD=|AMD=)?"
 jump = "(?:;JGT|;JEQ|;JGE|;JLT|;JNE|;JLE|;JMP)?"
 comp = "(?:[AMD][+-]1|[AM]-D|D[&+-][AM]|D\\|[AM]|[01]|[-!]?[AMD1])"
-legalCharsInLabel = "[A-Za-z_0-9]*"
+legalCharsInLabel = "[A-Za-z_0-9\.$]*"
 
 re_A_COMMAND = re.compile("@"+legalCharsInLabel)
 re_dest = re.compile(dest)
@@ -108,13 +108,3 @@ re_jump = re.compile(jump)
 re_comp = re.compile(comp)
 re_C_COMMAND = re.compile(dest + comp + jump)
 re_L_COMMAND = re.compile("\(" + legalCharsInLabel + "\)")
-
-def Test():
-    p = Parser("/home/ben/CS/Master/Nand2Tetris/projects/06/Assembler/stam")
-    if(p.hasMoreCommands()):
-        p.advance()
-        print p.commandType()
-        print p.comp()
-        print p.dest()
-        print p.jump()
-
