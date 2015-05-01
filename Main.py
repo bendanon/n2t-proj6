@@ -4,8 +4,6 @@ Initializes I/O files and drives the show.
 from Parser import Parser, CommandType
 from SymbolTable import SymbolTable
 from Code import Code
-import sys
-import ntpath
 
 
 def first_pass(path):
@@ -54,19 +52,9 @@ def second_pass(path, symbol_table):
     return hack
 
 
-def main(args):
-    if len(args) != 1:
-        print "Usage: (python) Main.py <.asm file path>"
-        return
-
-    asm_file_path = args[0]
-
-    asm_file_name = ntpath.basename(asm_file_path)
-    asm_dir_path = ntpath.dirname(asm_file_path)
-
-    hack_file_name = '.'.join(asm_file_name.split('.')[0:-1]) + ".hack"
-    hack_file_path = asm_dir_path + "/" + hack_file_name
-
+def main():
+    asm_file_path = "Input/rect/Rect.asm"
+    hack_file_path = "Input/rect/Rect.hack"
     symbol_table = first_pass(asm_file_path)
     hack = second_pass(asm_file_path, symbol_table)
     with open(hack_file_path, 'w') as output:
@@ -74,4 +62,4 @@ def main(args):
             output.write(line + "\n")
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main()
