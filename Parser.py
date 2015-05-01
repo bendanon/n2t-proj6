@@ -108,13 +108,3 @@ re_jump = re.compile(jump)
 re_comp = re.compile(comp)
 re_C_COMMAND = re.compile(dest + comp + jump)
 re_L_COMMAND = re.compile("\(" + legalCharsInLabel + "\)")
-
-def Test():
-    p = Parser("/home/ben/CS/Master/Nand2Tetris/projects/06/Assembler/stam")
-    if(p.hasMoreCommands()):
-        p.advance()
-        print p.commandType()
-        print p.comp()
-        print p.dest()
-        print p.jump()
-
