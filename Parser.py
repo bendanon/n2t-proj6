@@ -100,7 +100,7 @@ class CommandType:
 dest = "(?:M=|D=|MD=|A=|AM=|AD=|AMD=)?"
 jump = "(?:;JGT|;JEQ|;JGE|;JLT|;JNE|;JLE|;JMP)?"
 comp = "(?:[AMD][+-]1|[AM]-D|D[&+-][AM]|D\\|[AM]|[01]|[-!]?[AMD1])"
-legalCharsInLabel = "[A-Za-z_0-9]*"
+legalCharsInLabel = "[A-Za-z_0-9\.\$#]*"
 
 re_A_COMMAND = re.compile("@"+legalCharsInLabel)
 re_dest = re.compile(dest)
